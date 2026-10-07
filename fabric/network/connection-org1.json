@@ -1,0 +1,56 @@
+{
+  "name": "medtrust-consortium-network",
+  "version": "1.0.0",
+  "client": {
+    "organization": "HospitalOrg1",
+    "connection": {
+      "timeout": {
+        "peer": {
+          "endorser": "300"
+        }
+      }
+    }
+  },
+  "channels": {
+    "medtrustchannel": {
+      "orderers": ["orderer.medtrust.health"],
+      "peers": {
+        "peer0.hospitalorg1.medtrust.health": {
+          "endorsingPeer": true,
+          "chaincodeQuery": true,
+          "ledgerQuery": true,
+          "eventSource": true
+        }
+      }
+    }
+  },
+  "organizations": {
+    "HospitalOrg1": {
+      "mspid": "HospitalOrg1MSP",
+      "peers": ["peer0.hospitalorg1.medtrust.health"],
+      "certificateAuthorities": ["ca.hospitalorg1.medtrust.health"]
+    }
+  },
+  "orderers": {
+    "orderer.medtrust.health": {
+      "url": "grpcs://localhost:7050",
+      "grpcOptions": {
+        "ssl-target-name-override": "orderer.medtrust.health"
+      },
+      "tlsCACerts": {
+        "path": "fabric/network/crypto-config/ordererOrganizations/medtrust.health/orderers/orderer.medtrust.health/tls/ca.crt"
+      }
+    }
+  },
+  "peers": {
+    "peer0.hospitalorg1.medtrust.health": {
+      "url": "grpcs://localhost:7051",
+      "grpcOptions": {
+        "ssl-target-name-override": "peer0.hospitalorg1.medtrust.health"
+      },
+      "tlsCACerts": {
+        "path": "fabric/network/crypto-config/peerOrganizations/hospitalorg1.medtrust.health/peers/peer0.hospitalorg1.medtrust.health/tls/ca.crt"
+      }
+    }
+  }
+}

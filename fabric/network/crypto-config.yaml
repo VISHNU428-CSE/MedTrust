@@ -1,0 +1,16 @@
+# MedTrust Consortium Crypto Configuration
+OrdererOrgs:
+  - Name: Orderer
+    Domain: medtrust.health
+    EnableNodeOUs: true
+    Specs:
+      - Hostname: orderer
+
+PeerOrgs:
+  - Name: HospitalOrg1
+    Domain: hospitalorg1.medtrust.health
+    EnableNodeOUs: true
+    Template:
+      Count: 1
+    Users:
+      Count: 1

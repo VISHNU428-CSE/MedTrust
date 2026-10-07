@@ -1,0 +1,6 @@
+{
+  "name": "MedTrust | Secure EHR Sharing",
+  "description": "A patient-centric Electronic Health Record sharing and consent management platform powered by Hyperledger Fabric and IPFS.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,132 @@
+# MedTrust Consortium Configtx
+---
+Organizations:
+  - &OrdererOrg
+    Name: OrdererMSP
+    ID: OrdererMSP
+    MSPDir: crypto-config/ordererOrganizations/medtrust.health/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+      Writers:
+        Type: Signature
+        Rule: "OR('OrdererMSP.member')"
+      Admins:
+        Type: Signature
+        Rule: "OR('OrdererMSP.admin')"
+
+  - &HospitalOrg1
+    Name: HospitalOrg1MSP
+    ID: HospitalOrg1MSP
+    MSPDir: crypto-config/peerOrganizations/hospitalorg1.medtrust.health/msp
+    Policies:
+      Readers:
+        Type: Signature
+        Rule: "OR('HospitalOrg1MSP.admin', 'HospitalOrg1MSP.peer', 'HospitalOrg1MSP.client')"
+      Writers:
+        Type: Signature
+        Rule: "OR('HospitalOrg1MSP.admin', 'HospitalOrg1MSP.client')"
+      Admins:
+        Type: Signature
+        Rule: "OR('HospitalOrg1MSP.admin')"
+      Endorsement:
+        Type: Signature
+        Rule: "OR('HospitalOrg1MSP.peer')"
+    AnchorPeers:
+      - Host: peer0.hospitalorg1.medtrust.health
+        Port: 7051
+
+Capabilities:
+  Channel: &ChannelCapabilities
+    V2_0: true
+  Orderer: &OrdererCapabilities
+    V2_0: true
+  Application: &ApplicationCapabilities
+    V2_0: true
+
+Application: &ApplicationDefaults
+  Organizations:
+  Policies:
+    LifecycleEndorsement:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Endorsement"
+    Endorsement:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Endorsement"
+    Read:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Write:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admin:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+  Capabilities:
+    <<: *ApplicationCapabilities
+
+Orderer: &OrdererDefaults
+  OrdererType: etcdraft
+  Addresses:
+    - orderer.medtrust.health:7050
+  BatchTimeout: 2s
+  BatchSize:
+    MaxMessageCount: 10
+    AbsoluteMaxBytes: 99 MB
+    PreferredMaxBytes: 512 KB
+  Organizations:
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admin:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+    BlockValidation:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+  EtcdRaft:
+    Consenters:
+      - Host: orderer.medtrust.health
+        Port: 7050
+        ClientTLSCert: crypto-config/ordererOrganizations/medtrust.health/orderers/orderer.medtrust.health/tls/server.crt
+        ServerTLSCert: crypto-config/ordererOrganizations/medtrust.health/orderers/orderer.medtrust.health/tls/server.crt
+
+Channel: &ChannelDefaults
+  Policies:
+    Readers:
+      Type: ImplicitMeta
+      Rule: "ANY Readers"
+    Writers:
+      Type: ImplicitMeta
+      Rule: "ANY Writers"
+    Admin:
+      Type: ImplicitMeta
+      Rule: "MAJORITY Admins"
+  Capabilities:
+    <<: *ChannelCapabilities
+
+Profiles:
+  TwoOrgsOrdererGenesis:
+    <<: *ChannelDefaults
+    Orderer:
+      <<: *OrdererDefaults
+      Organizations:
+        - *OrdererOrg
+      Capabilities: *OrdererCapabilities
+    Consortiums:
+      SampleConsortium:
+        Organizations:
+          - *HospitalOrg1
+  MedTrustChannel:
+    Consortium: SampleConsortium
+    <<: *ChannelDefaults
+    Application:
+      <<: *ApplicationDefaults
+      Organizations:
+        - *HospitalOrg1
+      Capabilities: *ApplicationCapabilities
